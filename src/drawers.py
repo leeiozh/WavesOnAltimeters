@@ -23,7 +23,7 @@ def draw_grid(m: Basemap):
     m.drawparallels(np.arange(-5, 100, 5), labels=[True, False, True, False], zorder=1, color='grey')
 
 
-def draw_coords(m: Basemap, track_lat: np.ndarray, track_lon: np.ndarray, track_buoy: np.ndarray, color1: str,
+def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.ndarray, color1: str,
                 color2: str):
     """
     Отрисовывает трек на карте

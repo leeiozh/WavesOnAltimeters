@@ -1,17 +1,16 @@
 import netCDF4 as nc
-import numpy as np
 import pandas as pd
 import glob
-import converters
+from src.converters import *
 
 TRACK_TYPE = np.ndarray(shape=(5,), dtype=float)
 
 
 def read_track_height(file: str):
     data = pd.read_csv(file, delimiter=",")
-    data["Широта"] = data["Широта"].apply(converters.to_deg)
-    data["Долгота"] = data["Долгота"].apply(converters.to_deg)
-    data["дата"] = data["дата"].apply(converters.utc_to_sec_inverse)
+    data["Широта"] = data["Широта"].apply(to_deg)
+    data["Долгота"] = data["Долгота"].apply(to_deg)
+    data["дата"] = data["дата"].apply(utc_to_sec)
 
     return data.to_numpy()
 
@@ -26,10 +25,10 @@ def read_track(file: str, station=False) -> TRACK_TYPE:
     """
     data = pd.read_csv(file, delimiter=",")
     if station:
-        data["name"] = data["name"].apply(converters.utc_to_sec_inverse)
+        data["name"] = data["name"].apply(utc_to_sec)
     else:
-        data["time_start"] = data["time_start"].apply(converters.utc_to_sec)
-        data["time_end"] = data["time_end"].apply(converters.utc_to_sec)
+        data["time_start"] = data["time_start"].apply(utc_to_sec)
+        data["time_end"] = data["time_end"].apply(utc_to_sec)
 
     return data.to_numpy()
 
@@ -41,7 +40,7 @@ def read_track_radar2(file: str) -> TRACK_TYPE:
     :return: данные из файла с переведенным временем
     """
     data = pd.read_csv(file, delimiter=",")
-    data["name"] = data["name"].apply(converters.utc_to_sec_inverse_noyear_sec)
+    data["name"] = data["name"].apply(utc_to_sec)
     tmp = data[['name', 'lat_radar', 'lon_radar']].to_numpy()
 
     return tmp

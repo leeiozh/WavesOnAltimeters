@@ -1,5 +1,3 @@
-import numpy as np
-import datetime as dt
 from src.drawers import *
 from src.converters import *
 from skyfield.api import load, wgs84

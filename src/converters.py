@@ -24,7 +24,7 @@ def utc_to_sec(utc: str, noyear=True, year=2022) -> float:
     :param year: для укороченных названий
     :return: время в секундах с J2000
     """
-    if utc[2] != '-' and utc[2] != ':':
+    if utc[2] != '-' and utc[2] != ':' and utc[2] != '.':
         if noyear:
             return (dt.datetime(int(utc[0:4]), int(utc[5:7]), int(utc[8:10]), int(utc[11:13]), int(utc[14:16]),
                                 0) - dt.datetime(2000, 1, 1, 0, 0, 0)).total_seconds()
