@@ -9,31 +9,32 @@ sys.path.append("/home/leeiozh/ocean/WavesOnAltimeters/src")
 from drawers import *
 from converters import *
 
+KML_OR_TXT = True
+
 # подгрузка данных о спутниках из файла
 sats = load.tle_file('tle/tle_data.txt')
 names = ['CFOSAT', 'HAIYANG-2B', 'JASON-3', 'SARAL', 'SENTINEL-3A', 'SENTINEL-3B', 'SENTINEL-6', 'CRYOSAT 2']
 sat_names = {sat.name: sat for sat in sats}
 sat_data = [sat_names[name] for name in names]
 
-# загрузка координат из KML, который генерирует OpenCPN
-fiona.drvsupport.supported_drivers['KML'] = 'rw'
-geo_df = gpd.read_file('track/test_seva.kml', driver='KML')
-track_df = pd.DataFrame(geo_df)["geometry"]
-station_pos_ll = np.array([wgs84.latlon(track_df[i].y, track_df[i].x) for i in range(track_df.shape[0] - 1)])
+if KML_OR_TXT:
+    # загрузка координат из KML, который генерирует OpenCPN
+    fiona.drvsupport.supported_drivers['KML'] = 'rw'
+    geo_df = gpd.read_file('track/test_seva.kml', driver='KML')
+    track_df = pd.DataFrame(geo_df)["geometry"]
+    station_pos_ll = np.array([wgs84.latlon(track_df[i].y, track_df[i].x) for i in range(track_df.shape[0] - 1)])
+    # указываем время старта
+    start_time = dt.datetime(2023, 4, 27, 0, 0, 0, tzinfo=dt.timezone.utc)
 
-# загрузка координат из txt, который мы забили руками
-# station_pos_ = np.loadtxt("chain_east.txt", delimiter=' ')
-# station_pos = np.zeros((station_pos_.shape[0], 2))
-# station_pos[:, 0] = -(station_pos_[:, 0] + station_pos_[:, 1] / 60)
-# station_pos[:, 1] = -(station_pos_[:, 2] + station_pos_[:, 3] / 60)
-#
-# station_pos_ll = np.array([wgs84.latlon(ll[0], ll[1]) for ll in station_pos])
-
-# указываем время старта
-start_time = dt.datetime(2023, 4, 27, 0, 0, 0, tzinfo=dt.timezone.utc)
-
-# последним аргументом указываем предполагаемую скорость в УЗЛАХ
-track_time = calc_time(track_df, start_time, speed=9)
+    # последним аргументом указываем предполагаемую скорость в УЗЛАХ
+    track_time = calc_time(track_df, start_time, speed=9)
+else:
+    # загрузка координат из txt, который мы забили руками
+    station_pos_ = np.loadtxt("track/chain_east.txt", delimiter=' ')
+    station_pos = np.zeros((station_pos_.shape[0], 2))
+    station_pos[:, 0] = (station_pos_[:, 0] + station_pos_[:, 1] / 60)
+    station_pos[:, 1] = (station_pos_[:, 2] + station_pos_[:, 3] / 60)
+    station_pos_ll = np.array([wgs84.latlon(ll[0], ll[1]) for ll in station_pos])
 
 # *** drawing map ***
 plt.figure()
@@ -53,19 +54,21 @@ colors = ['yellow', 'red', 'orange', 'green', 'blue', 'purple', 'pink', 'grey']
 height = np.array([519, 966, 1336, 781, 814, 804, 1336, 728])  # height of altimeters orbits
 alt = 90 - calc_alt(220, height) / np.pi * 180  # there 220 is max permitted distance between altimeter and vessel
 
-for n in range(track_time.shape[0] - 1):
+for n in range(station_pos_ll.shape[0] - 1):
 
     ts = load.timescale()
 
-    # если нужен расчет на завтра -- просто меняем дату в двух строках ниже
-    # time1 = ts.from_datetime(dt.datetime(2022, 12, 6, 0, 0, 0, tzinfo=dt.timezone.utc))
-    # time2 = ts.from_datetime(dt.datetime(2022, 12, 6, 23, 59, 0, tzinfo=dt.timezone.utc))
-    # res = [sat_data[i].find_events(station_pos_ll[n], time1, time2, altitude_degrees=alt[i]) for i in
-    #        range(len(sat_data))]
-
-    res = [
-        sat_data[i].find_events(station_pos_ll[n], ts.from_datetime(track_time[n]), ts.from_datetime(track_time[n + 1]),
-                                altitude_degrees=alt[i]) for i in range(len(sat_data))]
+    if not KML_OR_TXT:
+        # если нужен расчет на завтра -- просто меняем дату в двух строках ниже
+        time1 = ts.from_datetime(dt.datetime(2022, 12, 6, 0, 0, 0, tzinfo=dt.timezone.utc))
+        time2 = ts.from_datetime(dt.datetime(2022, 12, 6, 23, 59, 0, tzinfo=dt.timezone.utc))
+        res = [sat_data[i].find_events(station_pos_ll[n], time1, time2, altitude_degrees=alt[i]) for i in
+               range(len(sat_data))]
+    else:
+        res = [
+            sat_data[i].find_events(station_pos_ll[n], ts.from_datetime(track_time[n]),
+                                    ts.from_datetime(track_time[n + 1]),
+                                    altitude_degrees=alt[i]) for i in range(len(sat_data))]
 
     for i in range(len(names)):
         if len(res[i][0]) > 0:
