@@ -1,7 +1,10 @@
 import netCDF4 as nc
 import pandas as pd
 import glob
-from src.converters import *
+import sys
+
+sys.path.append("/home/leeiozh/ocean/WavesOnAltimeters/src")
+from converters import *
 
 TRACK_TYPE = np.ndarray(shape=(5,), dtype=float)
 

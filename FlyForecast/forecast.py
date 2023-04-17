@@ -5,9 +5,9 @@ import pandas as pd
 import fiona
 import sys
 
-sys.path.insert(0, '../src')
-from src.drawers import *
-from src.converters import *
+sys.path.append("/home/leeiozh/ocean/WavesOnAltimeters/src")
+from drawers import *
+from converters import *
 
 # подгрузка данных о спутниках из файла
 sats = load.tle_file('tle/tle_data.txt')
