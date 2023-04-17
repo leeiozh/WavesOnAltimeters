@@ -10,10 +10,15 @@
 
 ```sh
 git clone https://github.com/leeiozh/WavesOnAltimeters.git
-cd WavesOnRadar
+cd WavesOnAltimeters
 conda create -y --name alti_env python=3.10
 conda install --force-reinstall -y -q --name alti_env -c conda-forge --file requirements.txt
 conda activate alti_env
+```
+
+Альтернативно без conda:
+```sh
+pip install -r requirements.txt
 ```
 
 Если вы собираетесь использовать прогнозера пролетов, **обязательно** регулярно обновляйте данные об орбите спутников.

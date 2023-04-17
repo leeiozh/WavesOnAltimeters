@@ -1,9 +1,11 @@
+import matplotlib.pyplot as plt
+from skyfield.api import wgs84
+import sys
+
+sys.path.insert(0, '../src')
 from src.readers import *
 from src.checkers import *
 from src.drawers import *
-import matplotlib.pyplot as plt
-import numpy as np
-from skyfield.api import wgs84
 
 WIN_TIME = 7200  # окно по времени в секундах
 WIN_ANGLE = 2.5  # окно по координате в градусах

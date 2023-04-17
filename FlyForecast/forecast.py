@@ -1,10 +1,13 @@
-from src.drawers import *
-from src.converters import *
 from skyfield.api import load, wgs84
 import matplotlib.pyplot as plt
 import geopandas as gpd
 import pandas as pd
 import fiona
+import sys
+
+sys.path.insert(0, '../src')
+from src.drawers import *
+from src.converters import *
 
 # подгрузка данных о спутниках из файла
 sats = load.tle_file('tle/tle_data.txt')
