@@ -4,7 +4,7 @@ from src.drawers import *
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from skyfield.api import load, wgs84
+from skyfield.api import wgs84
 
 WIN_TIME = 7200  # окно по времени в секундах
 WIN_ANGLE = 2.5  # окно по координате в градусах
@@ -12,8 +12,8 @@ WIN_ANGLE = 2.5  # окно по координате в градусах
 fig, axs = plt.subplots(1, 1, figsize=(7, 7), facecolor='w', edgecolor='k')
 
 # чтение треков
-df = pd.read_csv('/home/leeiozh/ocean/WavesOnAltimeters/TrackProcess/radar_station_coords.csv', delimiter=',')
-track_ship = read_track_radar2('/home/leeiozh/ocean/WavesOnAltimeters/TrackProcess/radar_station_coords.csv')
+df = pd.read_csv('track/radar_station_coords.csv', delimiter=',')
+track_ship = read_track_radar2('radar_station_coords.csv')
 sat_names = ['j3', 'cfo', 'al', 'h2b', 'c2', 's3a', 's3b']
 sat_labels = ['Jason-3', 'CFOSAT', 'SARAL', 'HaiYang-2B', 'CryoSat-2', 'Sentinel-3A', 'Sentinel-3B']
 
@@ -23,8 +23,8 @@ print("tracks uploaded successfully")
 
 # отрисовка карты
 station_pos_ll = np.array([wgs84.latlon(ll[0], ll[1]) for ll in track_ship[:, 1:3]])
-map = make_map()
-draw_grid(map)
+map = make_map(-30, 25, 55, -5)
+draw_grid(map, 5, 5)
 draw_coords(map, track_lat=[ll.latitude.degrees for ll in station_pos_ll],
             track_lon=[ll.longitude.degrees for ll in station_pos_ll],
             track_buoy=np.ones(len(station_pos_ll)), color1='white', color2='black')
@@ -65,7 +65,7 @@ for t in range(len(track_ship[:, 0])):  # цикл по времени
                 if near:
                     # alpha = min(1 - np.abs(sat_near_ship[0, p] - (track_ship[t, 0])) / WIN_TIME, 0.8)
                     alpha = max(1 - np.abs(sat_near_ship[0, p] - (track_ship[t, 0])) / WIN_TIME, 0.2)
-                    draw_point(map, lat_lon, colors[color_num], alpha)
+                    draw_point(map, lat_lon, colors[color_num], alpha, True)
 
                     if dist < dist_min:
                         lat_lon_min = lat_lon
@@ -86,12 +86,13 @@ for t in range(len(track_ship[:, 0])):  # цикл по времени
                 # plt.plot([-360 + lat_lon_min[1], track_ship[t, 2]], [lat_lon_min[0], track_ship[t, 1]], color=colors[color_num], alpha=alpha)
 
         if len(sat_track) > 0:
-            # print(track_ship[t, 1], track_ship[t, 2], color_num, alpha, lat_sat, lon_sat)
-            # print(sat_track)
-            # print(int(track_ship[:, 0][t]), sat_labels[color_num], converters.sec_to_utc(sat_near_ship[0, p_min]),
-            #       sat_track, time)
-            # print(str(df["name"].loc[t]) + "," + str(sat_labels[color_num]))
-            print(str(df["name"].loc[t]), str(sat_labels[color_num]), sat_track[:], time)
+            print(str(df["name"].loc[t]), end=' ')
+            print('{0: <12}'.format(sat_labels[color_num]), end=' ')
+            print('diff in min >>', "{0:3.2f}".format(time[0]), end=' ; ')
+            print('diff in km >>', "{0:3.2f}".format(111 * sat_track[0][0]), end=' ; ')
+            print('SWH >>', sat_track[0][1])
 
-plt.savefig('ai63_radar_pasta.png', dpi=700, transparent=True)
+            #print(str(df["name"].loc[t]), str(sat_labels[color_num]), sat_track[:], time)
+
+plt.savefig('pics/ai63_radar_pasta.png', dpi=700, transparent=True)
 plt.show()

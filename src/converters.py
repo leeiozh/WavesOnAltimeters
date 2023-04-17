@@ -1,6 +1,6 @@
 import datetime as dt
 import numpy as np
-from pandas._libs.tslibs.timezones import UTC
+import geopy.distance as dist
 
 
 def calc_alt(length, height):
@@ -49,7 +49,7 @@ def sec_to_utc(sec: float) -> dt.datetime:
     return dt.datetime(2000, 1, 1, 0, 0, 0) + dt.timedelta(seconds=sec)
 
 
-def to_deg(inp) -> float:
+def to_deg(inp: str) -> float:
     arr = inp.split()
     if len(arr) > 1:
         return int(arr[0]) + float(arr[1]) / 60
@@ -67,5 +67,14 @@ def r_to_latlon(r) -> (np.ndarray, np.ndarray):
 def time_to_sf(time: np.ndarray) -> list:
     res = np.ndarray(time.shape, dtype=dt.datetime)
     for i in range(len(res)):
-        res[i] = dt.datetime(2000, 1, 1, 0, 0, 0, tzinfo=UTC) + dt.timedelta(seconds=time[i])
+        res[i] = dt.datetime(2000, 1, 1, 0, 0, 0, tzinfo=dt.timezone.utc) + dt.timedelta(seconds=time[i])
     return res.tolist()
+
+
+def calc_time(track, start, speed):
+    res = np.ndarray(track.shape[0] - 1, dtype=dt.datetime)
+    res[0] = start
+    for i in range(res.shape[0] - 1):
+        res[i + 1] = res[i] + dt.timedelta(
+            hours=(dist.geodesic((track[i + 1].x, track[i + 1].y), (track[i].x, track[i].y)).miles / speed))
+    return res

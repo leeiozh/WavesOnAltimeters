@@ -2,25 +2,25 @@ from mpl_toolkits.basemap import Basemap
 import numpy as np
 
 
-def make_map() -> Basemap:
+def make_map(left, right, up, down) -> Basemap:
     """
     Отрисовывает карту
     :return: карта
     """
 
-    m = Basemap(resolution='l', projection='cyl', llcrnrlon=-30, llcrnrlat=-5, urcrnrlon=25, urcrnrlat=55)
+    m = Basemap(resolution='l', projection='cyl', llcrnrlon=left, llcrnrlat=down, urcrnrlon=right, urcrnrlat=up)
     m.drawcoastlines()
     m.fillcontinents()
     return m
 
 
-def draw_grid(m: Basemap):
+def draw_grid(m: Basemap, lat_step, lon_step):
     """
     Отрисовывает сетку на карте
     :param m: карта
     """
-    m.drawmeridians(np.arange(-30, 100., 5), labels=[True, False, False, True], zorder=1, color='grey')
-    m.drawparallels(np.arange(-5, 100, 5), labels=[True, False, True, False], zorder=1, color='grey')
+    m.drawmeridians(np.arange(-30, 100., lon_step), labels=[True, False, False, True], zorder=1, color='grey')
+    m.drawparallels(np.arange(-5, 100, lat_step), labels=[True, False, True, False], zorder=1, color='grey')
 
 
 def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.ndarray, color1: str,
@@ -40,7 +40,7 @@ def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.nda
     m.scatter(xpt, ypt, color=color1, label='Satellite mission:', alpha=0.)
 
 
-def draw_point(m: Basemap, lat_lon: np.ndarray, color: str, alpha, flag=True):
+def draw_point(m: Basemap, lat_lon: list, color: str, alpha, flag=True):
     """
     Отрисовывает одну точку на карте
     :param m: карта
