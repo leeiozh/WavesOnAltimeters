@@ -19,8 +19,8 @@ def draw_grid(m: Basemap, lat_step, lon_step):
     Отрисовывает сетку на карте
     :param m: карта
     """
-    m.drawmeridians(np.arange(-30, 100., lon_step), labels=[True, False, False, True], zorder=1, color='grey')
-    m.drawparallels(np.arange(-5, 100, lat_step), labels=[True, False, True, False], zorder=1, color='grey')
+    m.drawmeridians(np.arange(-180, 180., lon_step), labels=[True, False, False, True], zorder=1, color='grey')
+    m.drawparallels(np.arange(-90, 90, lat_step), labels=[True, False, True, False], zorder=1, color='grey')
 
 
 def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.ndarray, color1: str,
