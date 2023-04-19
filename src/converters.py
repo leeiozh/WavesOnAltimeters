@@ -104,15 +104,17 @@ def convert_list(name_sheet, sheet, list):
     sheet.to_excel(name_sheet, index=False, engine='openpyxl')
     wb = openpyxl.load_workbook(name_sheet)
     ws = wb['Sheet1']
-    d = 1
     alhpabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
     for i in range(len(list)):
+
         if len(list[i]) != 0:
             if curr_date != list[i][0]['date']:
                 curr_date = list[i][0]['date']
-                d += 1
+                d = (sheet.index[sheet['date'] == curr_date][0]) + 2
                 k = 0
             for j in range(len(list[i])):
                 k += 1
                 ws[str(alhpabet[k] + str(d))].fill = PatternFill(patternType='solid', fgColor=list[i][j]['color'])
+
+
     wb.save(name_sheet)

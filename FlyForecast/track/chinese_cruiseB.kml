@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<kml xmlns:atom="http://www.w3.org/2005/Atom" xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>OpenCPN Route</name>
+    <Placemark>
+      <name>001</name>
+      <description></description>
+      <Point>
+        <coordinates>-68.0262,-54.8299,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>002</name>
+      <description></description>
+      <Point>
+        <coordinates>-65.3191,-55.2375,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>003</name>
+      <description></description>
+      <Point>
+        <coordinates>-63.6791,-56.5013,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>004</name>
+      <description></description>
+      <Point>
+        <coordinates>-62.0983,-57.7981,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>005</name>
+      <description></description>
+      <Point>
+        <coordinates>-60.4384,-59.1818,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>006</name>
+      <description></description>
+      <Point>
+        <coordinates>-59.0355,-60.5408,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>007</name>
+      <description></description>
+      <Point>
+        <coordinates>-57.3756,-61.9381,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>008</name>
+      <description></description>
+      <Point>
+        <coordinates>-60.1815,-62.7905,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>009</name>
+      <description></description>
+      <Point>
+        <coordinates>-61.9402,-63.6977,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>010</name>
+      <description></description>
+      <Point>
+        <coordinates>-64.0545,-64.3212,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>011</name>
+      <description></description>
+      <Point>
+        <coordinates>-64.8054,-65.1559,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>012</name>
+      <description></description>
+      <Point>
+        <coordinates>-65.3784,-65.8199,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>013</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.0502,-66.3486,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>014</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.3269,-65.8037,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>015</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.2676,-64.2096,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>016</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.2478,-62.6001,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>017</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.2083,-60.9943,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>018</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.1688,-59.3937,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>019</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.3862,-57.7876,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>020</name>
+      <description></description>
+      <Point>
+        <coordinates>-66.7418,-56.2167,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>021</name>
+      <description></description>
+      <Point>
+        <coordinates>-67.2556,-54.9549,0. </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Path</name>
+      <LineString>
+        <coordinates>-68.0262,-54.8299,0. -65.3191,-55.2375,0. -63.6791,-56.5013,0. -62.0983,-57.7981,0. -60.4384,-59.1818,0. -59.0355,-60.5408,0. -57.3756,-61.9381,0. -60.1815,-62.7905,0. -61.9402,-63.6977,0. -64.0545,-64.3212,0. -64.8054,-65.1559,0. -65.3784,-65.8199,0. -66.0502,-66.3486,0. -66.3269,-65.8037,0. -66.2676,-64.2096,0. -66.2478,-62.6001,0. -66.2083,-60.9943,0. -66.1688,-59.3937,0. -66.3862,-57.7876,0. -66.7418,-56.2167,0. -67.2556,-54.9549,0. </coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>
