@@ -76,5 +76,5 @@ def calc_time(track, start, speed):
     res[0] = start
     for i in range(res.shape[0] - 1):
         res[i + 1] = res[i] + dt.timedelta(
-            hours=(dist.geodesic((track[i + 1].x, track[i + 1].y), (track[i].x, track[i].y)).miles / speed))
+            hours=(dist.geodesic((track[i + 1].y, track[i + 1].x), (track[i].y, track[i].x)).nm / speed))
     return res

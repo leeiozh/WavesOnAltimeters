@@ -1,3 +1,4 @@
+import numpy as np
 from skyfield.api import load, wgs84
 import matplotlib.pyplot as plt
 import geopandas as gpd
@@ -9,10 +10,10 @@ sys.path.append("/home/leeiozh/ocean/WavesOnAltimeters/src")
 from drawers import *
 from converters import *
 
-TRACK_FILE = "track/chinese_cruiseA.kml"
+TRACK_FILE = "track/test_seva.kml"
 KML_OR_TXT = (TRACK_FILE[-3:] == 'kml')  # флаг, юзать данные из KML (долгосрочный прогноз) или TXT (на пару дней)
-SPEED = 7.5 * 1.8  # предполагаемая скорость в узлах
-START_TIME = dt.datetime(2023, 12, 1, 0, 0, 0, tzinfo=dt.timezone.utc)  # время старта расчета
+SPEED = 9  # предполагаемая скорость в узлах
+START_TIME = dt.datetime(2023, 4, 28, 8, 0, 0, tzinfo=dt.timezone.utc)  # время старта расчета
 END_TIME = 1  # количество суток краткосрочного расчета (не советую ставить больше 2)
 MAX_DISTANCE = 220  # максимальное расстояние по поверхности между треком судна и спутника в километрах
 
@@ -25,7 +26,7 @@ sat_data = [sat_names[name] for name in names]
 if KML_OR_TXT:
     # загрузка координат из KML, который генерирует OpenCPN
     fiona.drvsupport.supported_drivers['KML'] = 'rw'
-    geo_df = gpd.read_file('track/chinese_cruiseA.kml', driver='KML')
+    geo_df = gpd.read_file(TRACK_FILE, driver='KML')
     track_df = pd.DataFrame(geo_df)["geometry"]
     station_pos_ll = np.array([wgs84.latlon(track_df[i].y, track_df[i].x) for i in range(track_df.shape[0] - 1)])
     track_time = calc_time(track_df, START_TIME, speed=SPEED)
@@ -42,7 +43,8 @@ else:
 plt.figure()
 
 # для отрисовки карты нужно указать крайние наносимые координаты
-map = make_map(left=-70, right=-35, up=-50, down=-70)
+map = make_map(left=-20, right=30, up=60, down=30)
+# map = make_map(left=-70, right=-35, up=-50, down=-70)
 
 # для отрисовки сетки нужно указать ее шаг
 draw_grid(map, lat_step=5, lon_step=5)
@@ -61,6 +63,7 @@ res_sheet = []
 for n in range(station_pos_ll.shape[0] - 1):  # цикл по станциям
 
     ts = load.timescale()
+    res_sheet.append([])
 
     if not KML_OR_TXT:
         time1 = ts.from_datetime(START_TIME)
@@ -69,30 +72,38 @@ for n in range(station_pos_ll.shape[0] - 1):  # цикл по станциям
         time1 = ts.from_datetime(track_time[n])
         time2 = ts.from_datetime(track_time[n + 1])
 
-    res = [sat_data[i].find_events(station_pos_ll[n], time1, time2, altitude_degrees=alt[i]) for i in
-           range(len(sat_data))]
-
     for i in range(len(names)):  # цикл по спутникам
-        if len(res[i][0]) > 0:
+
+        res_sat = sat_data[i].find_events(station_pos_ll[n], time1, time2, altitude_degrees=alt[i])
+
+        if len(res_sat[0]) > 0:
             print(names[i])
-            for t in res[i][0]:
+            for t in res_sat[0]:
                 ll = wgs84.latlon_of(sat_data[i].at(t))
-                if len(res[i][0]) == 3 and t == res[i][0][1]:
-                    # вывод в консоль времени и координат ближайшей к треку точки пролета
-                    print(t.utc_datetime().date(), t.utc_datetime().time().strftime("%H:%M"))
-                    print(ll[0].degrees, ",", ll[1].degrees)
-                    print()
+                if len(res_sat[0]) == 3 and t == res_sat[0][1]:
                     dist_km = dist.geodesic((ll[0].degrees, ll[1].degrees), (
                         station_pos_ll[n].latitude.degrees, station_pos_ll[n].longitude.degrees)).km
 
-                    res_sheet.append(
+                    # res_sheet[-1]['sat_name'].append(names[i])
+                    # res_sheet[-1]['date'].append(t.utc_datetime().date())
+                    # res_sheet[-1]['time'].append(t.utc_datetime().time().strftime("%H:%M"))
+                    # res_sheet[-1]['dist'].append(dist_km)
+
+                    res_sheet[n].append(
                         {'sat_name': names[i], 'date': t.utc_datetime().date(),
                          'time': t.utc_datetime().time().strftime("%H:%M"),
                          'dist': dist_km})
 
+                    # вывод в консоль времени и координат ближайшей к треку точки пролета
+                    print(t.utc_datetime().date(), t.utc_datetime().time().strftime("%H:%M"))
+                    print("sat_coords", ll[0].degrees, ",", ll[1].degrees, "; min dist", dist_km, "km")
+                    print()
+
                 # отрисовка на карте трех точек: начало и конец попадания спутника в указанный радиус,
-                # между ними ближайшая к треку точка
+                # между ними кульминация
                 draw_point(map, [ll[0].degrees, ll[1].degrees], color=colors[i], alpha=1., flag=False)
+
+    res_sheet[n] = sorted(res_sheet[n], key=lambda x: x['time'])
 
 res_sheet = pd.DataFrame(res_sheet)
 res_sheet.to_excel("schedule.xlsx", index=False)
@@ -102,5 +113,5 @@ for i in range(len(sat_names)):
     plt.scatter([0], [0], color=colors[i], label=names[i])
 
 plt.legend(loc='lower right', fontsize="7")
-plt.savefig('pics/cruiseA.png', bbox_inches='tight', dpi=1000)
+plt.savefig('pics/' + TRACK_FILE[6:-4] + '.png', bbox_inches='tight', dpi=1000)
 plt.show()
