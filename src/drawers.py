@@ -35,7 +35,7 @@ def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.nda
     :param color2: цвет трека с буем
     """
     xpt, ypt = m(track_lon * track_buoy, track_lat * track_buoy)
-    m.scatter(xpt, ypt, color=color2, label='Radar station', zorder=10)
+    m.scatter(xpt, ypt, color=color2, label='Location every 6h', zorder=10, marker='+')
     xpt, ypt = m(track_lon, track_lat)
     m.scatter(xpt, ypt, color=color1, label='Satellite mission:', alpha=0.)
 

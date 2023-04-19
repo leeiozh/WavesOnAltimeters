@@ -1,6 +1,9 @@
 import datetime as dt
 import numpy as np
 import geopy.distance as dist
+import pandas as pd
+import openpyxl
+from openpyxl.styles import PatternFill
 
 
 def calc_alt(length, height):
@@ -78,3 +81,38 @@ def calc_time(track, start, speed):
         res[i + 1] = res[i] + dt.timedelta(
             hours=(dist.geodesic((track[i + 1].y, track[i + 1].x), (track[i].y, track[i].x)).nm / speed))
     return res
+
+
+def prepare_sheet(start, nums):
+    res = pd.DataFrame(columns=['date'])
+    res['date'] = [(start + dt.timedelta(days=i)).strftime("%Y-%m-%d") for i in range(nums)]
+    return res
+
+
+def convert_list(name_sheet, sheet, list):
+    curr_date = list[0][0]['date']
+    k = 0
+    for i in range(len(list)):
+        if len(list[i]) != 0:
+            if curr_date != list[i][0]['date']:
+                curr_date = list[i][0]['date']
+                k = 0
+            for j in range(len(list[i])):
+                k += 1
+                sheet.loc[sheet['date'] == curr_date, ("flight" + str(k))] = list[i][j]['time']
+
+    sheet.to_excel(name_sheet, index=False, engine='openpyxl')
+    wb = openpyxl.load_workbook(name_sheet)
+    ws = wb['Sheet1']
+    d = 1
+    alhpabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+    for i in range(len(list)):
+        if len(list[i]) != 0:
+            if curr_date != list[i][0]['date']:
+                curr_date = list[i][0]['date']
+                d += 1
+                k = 0
+            for j in range(len(list[i])):
+                k += 1
+                ws[str(alhpabet[k] + str(d))].fill = PatternFill(patternType='solid', fgColor=list[i][j]['color'])
+    wb.save(name_sheet)
