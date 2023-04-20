@@ -11,12 +11,12 @@ from drawers import *
 from converters import *
 
 # ПЕРЕМЕННЫЕ НИЖЕ НЕОБХОДИМО ПОДОГНАТЬ ПОД СВОИ ЗАДАЧИ
+START_TIME = dt.datetime(2023, 4, 28, 8, 0, 0, tzinfo=dt.timezone.utc)  # время старта расчета
 TRACK_FILE = "track/asv55.kml"
 SCHEDULE_FILE = "schedule_asv55.xlsx"
 SPEED = 9  # предполагаемая скорость в узлах
-START_TIME = dt.datetime(2023, 4, 28, 8, 0, 0, tzinfo=dt.timezone.utc)  # время старта расчета
 END_TIME = 23  # количество суток расчета
-MAX_DISTANCE = 200  # максимальное расстояние по поверхности между треком судна и спутника в километрах
+MAX_DISTANCE = 160  # максимальное расстояние по поверхности между треком судна и спутника в километрах
 
 plt.figure()
 # для отрисовки карты нужно указать крайние наносимые координаты
@@ -41,19 +41,24 @@ if KML_OR_TXT:
     track_df = pd.DataFrame(geo_df)["geometry"]
     station_pos_ll = np.array([wgs84.latlon(track_df[i].y, track_df[i].x) for i in range(track_df.shape[0] - 1)])
     track_time = calc_time(track_df, START_TIME, speed=SPEED)
+    draw_coords(map, track_lat=[ll.latitude.degrees for ll in station_pos_ll],
+                track_lon=[ll.longitude.degrees for ll in station_pos_ll], track_buoy=np.ones(len(station_pos_ll)),
+                color1='white', color2='black', track_time=track_time)
 
 else:
     # загрузка координат из txt, который мы забили руками
-    station_pos_ = np.loadtxt("track/chain_east.txt", delimiter=' ')
-    station_pos = np.zeros((station_pos_.shape[0], 2))
-    station_pos[:, 0] = (station_pos_[:, 0] + station_pos_[:, 1] / 60)
-    station_pos[:, 1] = (station_pos_[:, 2] + station_pos_[:, 3] / 60)
+    df = pd.read_csv(TRACK_FILE, sep=" ")
+    station_pos = np.zeros((df.shape[0], 2))
+    station_pos[:, 0] = np.sign(df["lat_deg"].to_numpy()) * (
+            np.abs(df["lat_deg"].to_numpy()) + df["lat_min"].to_numpy() / 60)
+    station_pos[:, 1] = np.sign(df["lon_deg"].to_numpy()) * (
+            np.abs(df["lon_deg"].to_numpy()) + df["lon_min"].to_numpy() / 60)
     station_pos_ll = np.array([wgs84.latlon(ll[0], ll[1]) for ll in station_pos])
 
-# отрисовка станций
-draw_coords(map, track_lat=[ll.latitude.degrees for ll in station_pos_ll],
-            track_lon=[ll.longitude.degrees for ll in station_pos_ll], track_buoy=np.ones(len(station_pos_ll)),
-            color1='white', color2='black', track_time=track_time)
+    # отрисовка станций
+    draw_coords(map, track_lat=[ll.latitude.degrees for ll in station_pos_ll],
+                track_lon=[ll.longitude.degrees for ll in station_pos_ll], track_buoy=np.ones(len(station_pos_ll)),
+                color1='white', color2='black')  # , track_time=track_time
 colors = ['yellow', 'red', 'orange', 'green', 'blue', 'purple', 'pink', 'grey']
 color_rgd = ['FFFF00', 'FF0000', 'FF8000', '009900', '0080FF', '7F00FF', 'FFCCFF', 'C0C0C0']
 
@@ -68,8 +73,12 @@ for n in range(station_pos_ll.shape[0] - 1):  # цикл по станциям
     res_list.append([])
 
     if not KML_OR_TXT:
-        time1 = ts.from_datetime(START_TIME)
-        time2 = ts.from_datetime(START_TIME + dt.timedelta(days=END_TIME))
+        time1 = dt.datetime.strptime(df["date_time"][n], '%Y-%m-%d_%H-%M')
+        time1 = time1.replace(tzinfo=dt.timezone.utc)
+        time1 = ts.from_datetime(time1)
+        time2 = dt.datetime.strptime(df["date_time"][n + 1], '%Y-%m-%d_%H-%M')
+        time2 = time2.replace(tzinfo=dt.timezone.utc)
+        time2 = ts.from_datetime(time2)
     else:
         time1 = ts.from_datetime(track_time[n])
         time2 = ts.from_datetime(track_time[n + 1])
@@ -102,8 +111,9 @@ for n in range(station_pos_ll.shape[0] - 1):  # цикл по станциям
 
     res_list[n] = sorted(res_list[n], key=lambda x: x['time'])
 
-res_sheet = prepare_sheet(START_TIME, END_TIME)
-convert_list(SCHEDULE_FILE, res_sheet, res_list)
+if KML_OR_TXT:
+    res_sheet = prepare_sheet(START_TIME, END_TIME)
+    convert_list(SCHEDULE_FILE, res_sheet, res_list)
 
 # отрисовка легенды
 for i in range(len(sat_names)):

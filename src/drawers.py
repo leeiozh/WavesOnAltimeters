@@ -25,7 +25,7 @@ def draw_grid(m: Basemap, lat_step, lon_step):
 
 
 def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.ndarray, color1: str,
-                color2: str, track_time=None):
+                color2: str, track_time=[-1]):
     """
     Отрисовывает трек на карте
     :param m: карта
@@ -37,12 +37,13 @@ def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.nda
     """
     xpt, ypt = m(track_lon * track_buoy, track_lat * track_buoy)
     m.scatter(xpt, ypt, color=color2, label='Location every 6h', zorder=10, marker='+')
-    for i in range(len(track_time)):
-        if i % 2 == 0:
-            x, y = m(track_lon[i] + 0.5, track_lat[i] + 0.5)
-        # else:
-        #     x, y = m(track_lon[i] - 0.5, track_lat[i] - 0.5)
-            plt.text(x, y, track_time[i].date().strftime("%d.%m"), fontdict={'size': 5})
+    if track_time[0] != -1:
+        for i in range(len(track_time)):
+            if i % 2 == 0:
+                x, y = m(track_lon[i] + 0.5, track_lat[i] + 0.5)
+                # else:
+                #     x, y = m(track_lon[i] - 0.5, track_lat[i] - 0.5)
+                plt.text(x, y, track_time[i].date().strftime("%d.%m"), fontdict={'size': 5})
     # xpt, ypt = m(track_lon, track_lat)
     # m.scatter(xpt, ypt, color=color1, label='Satellite mission:', alpha=0.)
 

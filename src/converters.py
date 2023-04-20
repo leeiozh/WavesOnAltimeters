@@ -90,9 +90,12 @@ def prepare_sheet(start, nums):
 
 
 def convert_list(name_sheet, sheet, list):
-    curr_date = list[0][0]['date']
+    st = 0
+    while len(list[st]) == 0:
+        st += 1
+    curr_date = list[st][0]['date']
     k = 0
-    for i in range(len(list)):
+    for i in range(st, len(list)):
         if len(list[i]) != 0:
             if curr_date != list[i][0]['date']:
                 curr_date = list[i][0]['date']
@@ -115,6 +118,5 @@ def convert_list(name_sheet, sheet, list):
             for j in range(len(list[i])):
                 k += 1
                 ws[str(alhpabet[k] + str(d))].fill = PatternFill(patternType='solid', fgColor=list[i][j]['color'])
-
 
     wb.save(name_sheet)
