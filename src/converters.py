@@ -43,6 +43,22 @@ def utc_to_sec(utc: str, noyear=True, year=2022) -> float:
                                 0) - dt.datetime(2000, 1, 1, 0, 0, 0)).total_seconds()
 
 
+def dt_to_sec(dtt):
+    return (dt.datetime.strptime(dtt[:19], "%Y-%m-%d %H:%M:%S") - dt.datetime(2000, 1, 1, 0, 0, 0)).total_seconds()
+
+
+def opcpn_to_deg(str):
+    sec = str.split(sep=',')[-1]
+    deg = str.split(sep=' ')[0]
+    min = str.split(sep=',')[0].split(sep=' ')[1]
+    sig = 1
+    if str[0] == '-':
+        sig = -1
+        deg = deg[1:]
+
+    return sig * (int(deg) + int(min) / 60 + int(sec) / 3600)
+
+
 def sec_to_utc(sec: float) -> dt.datetime:
     """
     Конвертер из секунд с J2000 в utc

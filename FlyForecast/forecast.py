@@ -1,22 +1,20 @@
-import numpy as np
 from skyfield.api import load, wgs84
-import matplotlib.pyplot as plt
 import geopandas as gpd
-import pandas as pd
 import fiona
 import sys
 
-sys.path.append("/home/leeiozh/ocean/WavesOnAltimeters/src")
-from drawers import *
-from converters import *
+sys.path.append(__file__[:-23] + "src")
+from src.drawers import *
+from src.converters import *
+
 
 # ПЕРЕМЕННЫЕ НИЖЕ НЕОБХОДИМО ПОДОГНАТЬ ПОД СВОИ ЗАДАЧИ
-START_TIME = dt.datetime(2023, 4, 28, 8, 0, 0, tzinfo=dt.timezone.utc)  # время старта расчета
+START_TIME = dt.datetime(2023, 9, 15, 15, 0, 0, tzinfo=dt.timezone.utc)  # время старта расчета
 TRACK_FILE = "track/asv55.kml"
 SCHEDULE_FILE = "schedule_asv55.xlsx"
-SPEED = 9  # предполагаемая скорость в узлах
-END_TIME = 23  # количество суток расчета
-MAX_DISTANCE = 160  # максимальное расстояние по поверхности между треком судна и спутника в километрах
+SPEED = 6  # предполагаемая скорость в узлах
+END_TIME = 40  # количество суток расчета
+MAX_DISTANCE = 200  # максимальное расстояние по поверхности между треком судна и спутника в километрах
 
 plt.figure()
 # для отрисовки карты нужно указать крайние наносимые координаты
@@ -113,6 +111,7 @@ for n in range(station_pos_ll.shape[0] - 1):  # цикл по станциям
 
 if KML_OR_TXT:
     res_sheet = prepare_sheet(START_TIME, END_TIME)
+    print(res_list)
     convert_list(SCHEDULE_FILE, res_sheet, res_list)
 
 # отрисовка легенды

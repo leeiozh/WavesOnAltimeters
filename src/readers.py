@@ -1,7 +1,8 @@
 import netCDF4 as nc
-import pandas as pd
 import glob
 import sys
+
+import pandas as pd
 
 sys.path.append("/home/leeiozh/ocean/WavesOnAltimeters/src")
 from converters import *
@@ -49,6 +50,22 @@ def read_track_radar2(file: str) -> TRACK_TYPE:
     return tmp
 
 
+def read_track_radar_ai64(file) -> TRACK_TYPE:
+    data = pd.read_csv(file, delimiter=';')
+    data["datetime"] = data["datetime"].apply(dt_to_sec)
+    tmp = data[['datetime', 'lat', 'lon']].to_numpy()
+    return tmp
+
+
+def read_track_radar_rae69(file) -> TRACK_TYPE:
+    data = pd.read_csv(file, delimiter=';')
+    data["time_start"] = data["time_start"].apply(dt_to_sec)
+    data["lat"] = data["lat"].apply(opcpn_to_deg)
+    data["lon"] = data["lon"].apply(opcpn_to_deg)
+    tmp = data[['time_start', 'lat', 'lon']].to_numpy()
+    return tmp
+
+
 def read_sat_data(path: str, names: list) -> np.ndarray:
     """
     Чтение данных со спутника
@@ -58,7 +75,7 @@ def read_sat_data(path: str, names: list) -> np.ndarray:
     """
     res = np.ndarray(shape=(len(names), 4), dtype=np.ndarray)
     for i in range(len(names)):
-        files = glob.glob(path + names[i] + '/*.nc')
+        files = glob.glob(path + "*" + names[i] + '*.nc')
         files.sort()
 
         res[i, 0] = np.array(nc.Dataset(files[0]).variables['time'][:])

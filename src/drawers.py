@@ -24,8 +24,7 @@ def draw_grid(m: Basemap, lat_step, lon_step):
     m.drawparallels(np.arange(-90, 90, lat_step), labels=[True, False, True, False], zorder=1, color='grey')
 
 
-def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.ndarray, color1: str,
-                color2: str, track_time=[-1]):
+def draw_coords(m: Basemap, track_lat: list, track_lon: list, color: str):
     """
     Отрисовывает трек на карте
     :param m: карта
@@ -35,8 +34,9 @@ def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.nda
     :param color1: цвет трека без буя
     :param color2: цвет трека с буем
     """
-    xpt, ypt = m(track_lon * track_buoy, track_lat * track_buoy)
-    m.scatter(xpt, ypt, color=color2, label='Location every 6h', zorder=10, marker='+')
+    xpt, ypt = m(track_lon, track_lat)
+    m.scatter(xpt, ypt, color=color, label='radar meas', zorder=10, marker='+')
+    """
     if track_time[0] != -1:
         for i in range(len(track_time)):
             if i % 2 == 0:
@@ -44,6 +44,7 @@ def draw_coords(m: Basemap, track_lat: list, track_lon: list, track_buoy: np.nda
                 # else:
                 #     x, y = m(track_lon[i] - 0.5, track_lat[i] - 0.5)
                 plt.text(x, y, track_time[i].date().strftime("%d.%m"), fontdict={'size': 5})
+    """
     # xpt, ypt = m(track_lon, track_lat)
     # m.scatter(xpt, ypt, color=color1, label='Satellite mission:', alpha=0.)
 
@@ -56,7 +57,7 @@ def draw_point(m: Basemap, lat_lon: list, color: str, alpha, flag=True):
     :param color: цвет
     :param alpha: прозрачность
     """
-    if flag:
+    if lat_lon[1] > 180:
         xpt, ypt = m(-360 + lat_lon[1], lat_lon[0])
     else:
         xpt, ypt = m(lat_lon[1], lat_lon[0])
